@@ -4,7 +4,7 @@ import serial.tools.list_ports
 
 XDEVPORT = "DEFAULT"
 YDEVPORT = "DEFAULT"
-ZDEVPORT = "DEFAULT"
+ZDEVPORT = "Arduino"
 
 class Maya:
 
@@ -41,11 +41,14 @@ class Maya:
         if "z" == axis.lower():
             if "NULL" != self.z_axis_device:
                 if "move_abs" == move_type:
-                    self.z_axis_device.write("MA,"+position)
+                    self.z_axis_device.write(("MA,"+position).encode('ascii'))
+                    #print(self.z_axis_device.readline())
                 elif "move_rel" == move_type:
-                    self.z_axis_device.write("MR,"+position)
+                    self.z_axis_device.write(("MR,"+position).encode('ascii'))
+                    #print(self.z_axis_device.readline())
                 elif "home" == move_type:
-                    self.z_axis_device.write("H,")
+                    self.z_axis_device.write("H,".encode('ascii'))
+                    #print(self.z_axis_device.readline())
                 else:
                     print("ERROR: invalid move type")
             else:
