@@ -1,5 +1,5 @@
-#include <SoftwareSerial.h>
-SoftwareSerial serialPort(0,1);
+//#include <SoftwareSerial.h>
+//SoftwareSerial serialPort(0,1);
 // 0.254 = 1 step
 int pwmCoilOne = 3;
 int pwmCoilTwo = 11;
@@ -12,7 +12,7 @@ float valueofmove;
 
 void setup() {
   // put your setup code here, to run once:
-  serialPort.begin(9600);
+  Serial.begin(9600);
   pinMode(pwmCoilOne, OUTPUT);
   pinMode(pwmCoilTwo, OUTPUT);
   pinMode(dirCoilOne, OUTPUT);
@@ -31,14 +31,13 @@ void loop() {
   // put your main code here, to run repeatedly:
   char rc;
   String recString = "";
-  serialPort.listen();
-  while (serialPort.available() > 0) {
+  while (Serial.available()) {
     rc = Serial.read();
     if (rc != '\n'){
-    recString = recString + serialPort.read();
+    recString = recString + Serial.read();
     }
   }
-  recString = recString.trim();
+  recString.replace(recString,recString.trim());
   recString[] = recString.c_str();
   parseData();
   valueofmove = valueofmove/1.27;
