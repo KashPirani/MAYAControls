@@ -2,7 +2,7 @@ from zaber.serial import BinarySerial, BinaryDevice, BinaryCommand, BinaryReply
 import serial
 import serial.tools.list_ports
 
-XYDEVPORT = "COM10"
+XYDEVPORT = "FTDIBUS\\VID_0403+PID_6001+AC01ZMXIA"
 ZDEVPORT = "Arduino"
 
 class Maya:
@@ -13,7 +13,7 @@ class Maya:
         z_com_port = "NULL"
         for port in com_ports:
             print(port)
-            if XYDEVPORT in port[1]:
+            if XYDEVPORT in port[2]:
                 xy_com_port = port[0]
             if ZDEVPORT in port[1]:
                 z_com_port = port[0]
@@ -29,19 +29,22 @@ class Maya:
             self.z_axis_device = "NULL"
             print("Could not find z-axis device")
         else:
-            self.z_axis_device = serial.Serial(z_com_port, 9600)
+            self.z_axis_device = serial.Serial(z_com_port, 115200)
 
     def move_dev(self, move_type, axis, position):
         if "z" == axis.lower():
             if "NULL" != self.z_axis_device:
                 if "move_abs" == move_type:
                     self.z_axis_device.write(("MA,"+position).encode('ascii'))
+                    self.z_axis_device.flush()
                     #print(self.z_axis_device.readline())
                 elif "move_rel" == move_type:
                     self.z_axis_device.write(("MR,"+position).encode('ascii'))
+                    self.z_axis_device.flush()
                     #print(self.z_axis_device.readline())
                 elif "home" == move_type:
                     self.z_axis_device.write("H,".encode('ascii'))
+                    self.z_axis_device.flush()
                     #print(self.z_axis_device.readline())
                 else:
                     print("ERROR: invalid move type")
