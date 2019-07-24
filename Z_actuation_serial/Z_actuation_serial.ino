@@ -7,8 +7,15 @@ int dirCoilOne = 12;
 int dirCoilTwo = 13;
 int brkCoilOne = 8;
 int brkCoilTwo = 9;
-char typeofmove;
+String typeofmove;
 float valueofmove;
+int posCounter = 0;
+String recString;
+char recCString[] = "";
+char moverel[] = "MR";
+char moveabs[] = "MA";
+char movehome[] = "MH";
+char sethome[] = "SH";
 
 void setup() {
   // put your setup code here, to run once:
@@ -19,8 +26,8 @@ void setup() {
   pinMode(dirCoilTwo, OUTPUT);
   pinMode(brkCoilOne, OUTPUT);
   pinMode(brkCoilTwo, OUTPUT);
-  analogWrite(pwmCoilOne, 86);
-  analogWrite(pwmCoilTwo,86);
+  analogWrite(pwmCoilOne, 255);
+  analogWrite(pwmCoilTwo,255);
   digitalWrite(dirCoilOne, LOW);
   digitalWrite(dirCoilTwo, LOW);
   digitalWrite(brkCoilOne, LOW);
@@ -30,86 +37,122 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   char rc;
-  String recString = "";
-  while (Serial.available()) {
-    rc = Serial.read();
-    if (rc != '\n'){
-    recString = recString + Serial.read();
-    }
+  recString = "";
+  typeofmove = "";
+  valueofmove = NULL;
+  if (Serial.available()) {
+    typeofmove = Serial.readStringUntil(',');
+    valueofmove = Serial.readStringUntil('\n').toInt();
+    Serial.print(typeofmove);
+    Serial.print(valueofmove);
+    
   }
-  recString.replace(recString,recString.trim());
-  recString[] = recString.c_str();
-  parseData();
-  valueofmove = valueofmove/1.27;
-  if (String(typeofmove).trim() == "MR") {
-  MoveRelative();
   
+  recString.trim();
+  recString.toCharArray(recCString, recString.length());
+  //recCString = recString.c_str();
+  //parseData();
+  
+  if (typeofmove == "MR") {
+    Move(valueofmove);
+    Serial.print("a");
+  }
+  else if (typeofmove == "MA") {
+    Move(valueofmove - posCounter);
+  }
+  else if (typeofmove == "MH") {
+    Move(-posCounter);
+  }
+  else if (typeofmove == "SH") {
+    posCounter = 0;
+  }
     
 }
-}    
-void parseData() {
 
+
+
+
+
+    
+//void parseData() {
+//
     // split the data into its parts
     
-  char * strtokIndx; // this is used by strtok() as an index
+//  char * strtokIndx; // this is used by strtok() as an index
   
-  strtokIndx = strtok(recString,",");      // get the first part - the string
-  strcpy(typeofmove, strtokIndx); // copy it to typeofmove
+  //strtokIndx = strtok(recCString,",");      // get the first part - the string
+  //strcpy(typeofmove, strtokIndx); // copy it to typeofmove
   
-  strtokIndx = strtok(NULL, ","); // this continues where the previous call left off
-  valueofmove = atof(strtokIndx);     // convert this part to an integer
-}
+  //strtokIndx = strtok(NULL, ","); // this continues where the previous call left off
+  //valueofmove = atoi(strtokIndx);     // convert this part to an integer
+//}
 
-void MoveRelative() {
-      if (valueofmove < 0) {
-      for (int i = 0, i >= valueofmove, i--) {
-        j = i%4;
+void Move(int movecount) {
+      if (movecount < 0) {
+      movecount*=-1;
+      for (int i = 0; i < movecount; i++) {
+        int j = i%4;
         if (j == 0) {
           digitalWrite(dirCoilOne, LOW);
           digitalWrite(dirCoilTwo, HIGH);
-          delay(1);
+          --posCounter;
+          delay(19);
+          
         }
         else if (j == 1) {
           digitalWrite(dirCoilOne, HIGH);
           digitalWrite(dirCoilTwo, HIGH);
-          delay(1);
+          --posCounter;
+          delay(19);
+          
         }
         else if (j == 2) {
           digitalWrite(dirCoilOne, HIGH);
           digitalWrite(dirCoilTwo, LOW);
-          delay(1);
+          --posCounter;
+          delay(19);
+         
         }
         else if (j == 3) {
           digitalWrite(dirCoilOne, LOW);
           digitalWrite(dirCoilTwo, LOW);
-          delay(1);
+          --posCounter;
+          delay(19);
+          
         }
      }  
   }
-  else if (valueofmove > 0) {
-      for (int i = 0, i <= valueofmove, i++) {
+  else if (movecount > 0) {
+      for (int i = 0; i <= movecount; i++) {
         int j = i%4;
         if (j == 0) {
           digitalWrite(dirCoilOne, HIGH);
           digitalWrite(dirCoilTwo, LOW);
-          delay(1);
+          ++posCounter;
+          delay(19);
+          
         }
         else if (j == 1) {
           digitalWrite(dirCoilOne, HIGH);
           digitalWrite(dirCoilTwo, HIGH);
-          delay(1);
+          ++posCounter;
+          delay(19);
+          
         }
         else if (j == 2) {
           digitalWrite(dirCoilOne, LOW);
           digitalWrite(dirCoilTwo, HIGH);
-          delay(1);
+          ++posCounter;
+          delay(19);
+          
         }
         else if (j == 3) {
           digitalWrite(dirCoilOne, LOW);
           digitalWrite(dirCoilTwo, LOW);
-          delay(1);
+          ++posCounter;
+          delay(19);
+          
         }
     }  
   }
-}
 }
