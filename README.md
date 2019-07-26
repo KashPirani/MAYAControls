@@ -1,2 +1,2 @@
 # MAYAControls
-Code to control movement of MAYA robot
+Code to control the movement of UWNRG's MAYA microrobot
